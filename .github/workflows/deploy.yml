@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository (with submodules)
         uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -20,19 +20,22 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Copy docker-compose files & .env to EC2 and deploy
+      - name: Create deploy directory on EC2
         run: |
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} "mkdir -p ~/deploy"
-          
-          scp -i key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_HOST }}:~/deploy/
-          
+
+      - name: Copy all necessary files to EC2
+        run: |
+          scp -i key.pem -o StrictHostKeyChecking=no \
+            -r BE ML docker-compose.yml ubuntu@${{ secrets.EC2_HOST }}:~/deploy/
+
+      - name: SSH and deploy on EC2
+        run: |
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << EOF
             cd ~/deploy
-          
+
             echo "${{ secrets.ENV_FILE }}" > .env
-          
-            git submodule update --remote --merge
-          
+
             docker compose down
             docker compose up -d --build
           EOF
