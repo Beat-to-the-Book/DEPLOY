@@ -22,15 +22,17 @@ jobs:
 
       - name: Copy docker-compose files & .env to EC2 and deploy
         run: |
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} "mkdir -p ~/deploy"
+          
           scp -i key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_HOST }}:~/deploy/
-
+          
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << EOF
             cd ~/deploy
-
+          
             echo "${{ secrets.ENV_FILE }}" > .env
-
+          
             git submodule update --remote --merge
-
+          
             docker compose down
             docker compose up -d --build
           EOF
