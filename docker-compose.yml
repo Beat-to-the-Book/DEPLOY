@@ -61,19 +61,13 @@ services:
       - ./zookeeper/log:/var/lib/zookeeper/log
     networks:
       - beat_to_the_book_network
-    healthcheck:
-      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181 | grep imok"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # Kafka
   kafka:
     image: confluentinc/cp-kafka:7.5.1
     container_name: beat_to_the_book_kafka
     depends_on:
-      zookeeper:
-        condition: service_healthy
+      - zookeeper
     ports:
       - "9092:9092"
     environment:
@@ -90,7 +84,7 @@ services:
       timeout: 5s
       retries: 5
 
-  #  # Kafka UI (Provectus)
+#  # Kafka UI (Provectus)
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka_ui
