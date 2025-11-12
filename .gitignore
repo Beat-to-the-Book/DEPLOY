@@ -59,3 +59,5 @@ venv.bak/
 .DS_Store
 *.log
 *.sqlite3
+
+beat-to-the-book-key*
