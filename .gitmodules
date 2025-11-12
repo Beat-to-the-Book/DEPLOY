@@ -1,0 +1,6 @@
+[submodule "BE"]
+	path = BE
+	url = https://github.com/Beat-to-the-Book/BE.git
+[submodule "ML"]
+	path = ML
+	url = https://github.com/Beat-to-the-Book/ML.git
